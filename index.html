@@ -1,0 +1,378 @@
+ < !DOCTYPE html >
+ < html lang = "es" >
+     < head >
+     < meta charset = "UTF-8" >
+     < title > CQA CLEAN - Mesa de Control <  / title >
+     < script src = "https://microsoft.com" >  <  / script >
+     < style >
+    body {
+    font - family: 'Segoe UI',
+    sans - serif;
+    padding: 12px;
+    background - color: #f3f2f1;
+    color: #323130;
+    font - size: 13px;
+}
+.section {
+    background: white;
+    padding: 12px;
+    border - radius: 4px;
+    box - shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    margin - bottom: 12px;
+}
+h3 {
+    margin: 0 0 8px 0;
+    color: #0078d4;
+    border - bottom: 2px solid #0078d4;
+    padding - bottom: 4px;
+    font - size: 14px;
+}
+.form - group {
+    margin - bottom: 8px;
+}
+label {
+    display: block;
+    font - weight: 600;
+    margin - bottom: 3px;
+    font - size: 11px;
+    color: #484644;
+}
+select, textarea {
+    width: 100 % ;
+    box - sizing: border - box;
+    padding: 6px;
+    border: 1px solid #a19f9d;
+    border - radius: 2px;
+    font - size: 12px;
+}
+textarea {
+    height: 45px;
+    resize: none;
+}
+.encargado - box {
+    background: #e2f0d9;
+    padding: 8px;
+    border - radius: 4px;
+    margin - bottom: 10px;
+    border: 1px solid #385723;
+}
+.foto - card {
+    border: 1px solid #e1dfdd;
+    padding: 8px;
+    margin - bottom: 8px;
+    border - radius: 3px;
+    background: #faf9f8;
+    display: flex;
+    flex - direction: column;
+    gap: 6px;
+}
+.foto - card.seleccionada {
+    border: 2px solid #107c41;
+    background: #f1f9f3;
+}
+.thumb {
+    width: 65px;
+    height: 50px;
+    object - fit: cover;
+    border - radius: 2px;
+    border: 1px solid #ccc;
+}
+.btn {
+    color: white;
+    border: none;
+    padding: 8px;
+    width: 100 % ;
+    cursor: pointer;
+    font - weight: bold;
+    border - radius: 2px;
+    margin - top: 4px;
+    font - size: 12px;
+}
+.btn - lab {
+    background - color: #107c41;
+}
+.btn - lab: hover {
+    background - color: #0b5930;
+}
+.btn - topo {
+    background - color: #0078d4;
+}
+.btn - topo: hover {
+    background - color: #106ebe;
+}
+.btn - sup {
+    background - color: #7030a0;
+}
+.btn - sup: hover {
+    background - color: #592580;
+}
+.btn - check {
+    background - color: #8794a0;
+    padding: 4px 8px;
+    font - size: 11px;
+}
+.btn - check.activo {
+    background - color: #107c41;
+}
+.badge {
+    float: right;
+    background: #333;
+    color: white;
+    padding: 1px 6px;
+    border - radius: 10px;
+    font - size: 11px;
+}
+ <  / style >
+ <  / head >
+ < body >
+
+ < div class = "section encargado-box" >
+     < label >  < strong > Firma Responsable de Guardia:  <  / strong >  <  / label >
+     < select id = "rol-encargado" onchange = "cambiarRolResponsable()" >
+     < option value = "Laboratorio" > Jefe de Laboratorio(Control LAB) <  / option >
+     < option value = "Topografía" > Jefe de Topografía(Control TOPO) <  / option >
+     < option value = "Supervisión" > Supervisor General(Control SUP y Cierre) <  / option >
+     <  / select >
+     <  / div >
+
+     < div class = "section" >
+     < div class = "form-group" >
+     < label > Frente de Trabajo Seleccionado:  <  / label >
+     < select id = "frente-activo" onchange = "renderizerBandeja()" >
+     < option value = "Tajo Gavilan" > Tajo Gavilán <  / option >
+     < option value = "Tajo Toldorrumi" > Tajo Toldorrumi <  / option >
+     < option value = "Relavera Rumichaca" > Relavera Rumichaca <  / option >
+     <  / select >
+     <  / div >
+     < div class = "form-group" >
+     < label > Clima Diario:  <  / label >
+     < select id = "clima-diario" >
+     < option value = "Parcialmente soleado" > Parcialmente soleado <  / option >
+     < option value = "Despejado" > Despejado <  / option >
+     < option value = "Nublado" > Nublado <  / option >
+     < option value = "Lluvioso" > Lluvioso <  / option >
+     <  / select >
+     <  / div >
+     <  / div >
+
+     < div class = "section" >
+     < h3 > Evidencias Disponibles < span id = "contador-rol" class = "badge" > 0 / 6 <  / span >  <  / h3 >
+     < div id = "contenedor-bandeja" >  <  / div >
+
+     < button class = "btn btn-lab" id = "btn-procesar-lab" style = "display:none;" > 📥 Guardar Hoja Laboratorio <  / button >
+     < button class = "btn btn-topo" id = "btn-procesar-topo" style = "display:none;" > 📥 Guardar Hoja Topografía <  / button >
+     < button class = "btn btn-sup" id = "btn-procesar-sup" style = "display:none;" > 📊 Cargar Supervisión y Cerrar Guardia <  / button >
+     <  / div >
+
+     < script >
+    let seleccionadas = [];
+// Imagen Base64 genérica de prueba de 1x1 píxeles para simulación local acelerada
+const b64Prueba = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+
+let fotosDeCampo = [{
+        id: 1,
+        area: "Laboratorio",
+        usuario: "M. Ruiz",
+        frente: "Tajo Gavilan",
+        desc: "Ensayo ASTM D-6913: Granulometría relave.",
+        src: "https://microsoft.com",
+        base64: [b64Prueba]
+    }, {
+        id: 2,
+        area: "Laboratorio",
+        usuario: "M. Ruiz",
+        frente: "Tajo Gavilan",
+        desc: "Muestreo ASTM D-75: Agregados en planta.",
+        src: "https://microsoft.com",
+        base64: [b64Prueba]
+    }, {
+        id: 3,
+        area: "Topografía",
+        usuario: "J. Quispe",
+        frente: "Tajo Gavilan",
+        desc: "Levantamiento topográfico cresta banco 4200.",
+        src: "https://microsoft.com",
+        base64: [b64Prueba]
+    }, {
+        id: 4,
+        area: "Supervisión",
+        usuario: "A. Gómez",
+        frente: "Tajo Gavilan",
+        desc: "Supervisión de Calidad - Descolgue paño 78.",
+        src: "https://microsoft.com",
+        base64: [b64Prueba]
+    }
+];
+
+Office.onReady((info) => {
+    if (info.host === Office.HostType.Excel) {
+        cambiarRolResponsable();
+        document.getElementById("btn-procesar-lab").onclick = () => insertarSeccionColaborativa("Laboratorio", "A7", "#107c41");
+        document.getElementById("btn-procesar-topo").onclick = () => insertarSeccionColaborativa("Topografía", "A18", "#0078d4");
+        document.getElementById("btn-procesar-sup").onclick = cierreSupervisorGeneral;
+    }
+});
+
+function cambiarRolResponsable() {
+    seleccionadas = [];
+    const rol = document.getElementById("rol-encargado").value;
+    document.getElementById("btn-procesar-lab").style.display = (rol === "Laboratorio") ? "block" : "none";
+    document.getElementById("btn-procesar-topo").style.display = (rol === "Topografía") ? "block" : "none";
+    document.getElementById("btn-procesar-sup").style.display = (rol === "Supervisión") ? "block" : "none";
+    renderizerBandeja();
+}
+
+function renderizerBandeja() {
+    const contenedor = document.getElementById("contenedor-bandeja");
+    contenedor.innerHTML = "";
+    const rolActivo = document.getElementById("rol-encargado").value;
+    const frenteActivo = document.getElementById("frente-activo").value;
+
+    const filtrados = fotosDeCampo.filter(f => f.frente === frenteActivo && f.area === rolActivo);
+
+    filtrados.forEach((item) => {
+        const esElegida = seleccionadas.includes(item.id);
+        const card = document.createElement("div");
+        card.className = `foto-card ${esElegida ? 'seleccionada' : ''}`;
+        card.innerHTML = `
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <img src="${item.src}" class="thumb">
+                        <div style="flex-grow:1; font-size:11px;"><strong>${item.usuario}</strong></div>
+                        <button class="btn btn-check ${esElegida ? 'activo' : ''}" style="width:auto; margin:0;" onclick="conmutarSeleccion(${item.id})">
+                            ${esElegida ? '✓ Incluida' : '➕ Elegir'}
+                        </button>
+                    </div>
+                    <textarea id="desc-${item.id}" onchange="actualizarTexto(${item.id}, this.value)">${item.desc}</textarea>
+                `;
+        contenedor.appendChild(card);
+    });
+    document.getElementById("contador-rol").innerText = `${seleccionadas.length} / 6`;
+}
+
+function actualizarTexto(id, txt) {
+    const idx = fotosDeCampo.findIndex(f => f.id === id);
+    if (idx !== -1)
+        fotosDeCampo[idx].desc = txt;
+}
+
+function conmutarSeleccion(id) {
+    const idx = seleccionadas.indexOf(id);
+    if (idx !== -1)
+        seleccionadas.splice(idx, 1);
+    else {
+        if (seleccionadas.length >= 6)
+            return;
+        seleccionadas.push(id);
+    }
+    renderizerBandeja();
+}
+
+function insertarSeccionColaborativa(areaNombre, celdaResumenInicio, colorHex) {
+    Excel.run(async(context) => {
+        const sheets = context.workbook.worksheets;
+        let targetSheet = sheets.getItemOrNullObject(areaNombre);
+        await context.sync();
+        if (targetSheet.isNullObject)
+            targetSheet = sheets.add(areaNombre);
+        else
+            targetSheet.getUsedRange().clear();
+
+        targetSheet.getRange("A1:D1").merge();
+        targetSheet.getRange("A1").values = [[`PANEL FOTOGRÁFICO DIARIO - AREA DE ${areaNombre.toUpperCase()}`]];
+        targetSheet.getRange("A1").format.font.bold = true;
+        targetSheet.getRange("A1").format.fill.color = colorHex;
+        targetSheet.getRange("A1").format.font.color = "White";
+
+        const datosArea = fotosDeCampo.filter(f => seleccionadas.includes(f.id));
+        const shapes = targetSheet.shapes;
+
+        const mapeoCeldas = [{
+                rangoFoto: "B11:F15",
+                desc: "B16"
+            }, {
+                rangoFoto: "I11:M15",
+                desc: "I16"
+            }, {
+                rangoFoto: "B18:F22",
+                desc: "B23"
+            }, {
+                rangoFoto: "I18:M22",
+                desc: "I23"
+            }, {
+                rangoFoto: "B25:F29",
+                desc: "B30"
+            }, {
+                rangoFoto: "I25:M29",
+                desc: "I30"
+            }
+        ];
+
+        for (let i = 0; i < datosArea.length; i++) {
+            if (i >= 6)
+                break;
+            const coordenadas = mapeoCeldas[i];
+
+            const celdaTexto = targetSheet.getRange(coordenadas.desc);
+            celdaTexto.values = [[datosArea[i].desc]];
+            celdaTexto.format.wrapText = true;
+            const rangoEspacioFoto = targetSheet.getRange(coordenadas.rangoFoto);
+            rangoEspacioFoto.load(["left", "top", "width", "height"]);
+            await context.sync();
+            let img = shapes.addImage(datosArea[i].base64);
+            img.width = rangoEspacioFoto.width - 6;
+            img.height = rangoEspacioFoto.height - 4;
+            img.left = rangoEspacioFoto.left + 3;
+            img.top = rangoEspacioFoto.top + 2;
+        }
+        let resumenSheet = sheets.getItemOrNullObject("Resumen Operativo");
+        await context.sync();
+        if (resumenSheet.isNullObject)
+            resumenSheet = sheets.add("Resumen Operativo");
+        resumenSheet.getRange(celdaResumenInicio).values = [[CONSOLIDADO DE ACTIVIDADES - AREA DE $ {
+                    areaNombre.toUpperCase()
+                }
+            ]];
+        resumenSheet.getRange(celdaResumenInicio).format.font.bold = true;
+        let fRes = parseInt(celdaResumenInicio.replace(/[A-Z]/g, '')) + 1;
+        datosArea.forEach((item, idx) => {
+            resumenSheet.getRange(A$ {
+                fRes
+            }).values = [[Registro 0$ {
+                        idx + 1
+                    }
+                    : ]];
+            resumenSheet.getRange(B$ {
+                fRes
+            }
+                : D$ {
+                fRes
+            }).merge();
+            resumenSheet.getRange(B$ {
+                fRes
+            }).values = [[item.desc]];
+            resumenSheet.getRange(`B${fRes}).format.wrapText = true;
+fRes++;
+});
+await context.sync();
+alert(¡Sección de ${areaNombre} generada exitosamente en sus celdas fijas!);
+                        });
+                        }
+                        function cierreSupervisorGeneral() {
+                        insertarSeccionColaborativa("Supervisión", "A29", "#7030a0");
+                        Excel.run(async (context) => {
+                        const sheet = context.workbook.worksheets.getItem("Resumen Operativo");
+                        sheet.activate();
+                        const fechaHoy = new Date().toLocaleDateString('es-PE');
+                        const climaElegido = document.getElementById("clima-diario").value;
+                        const tempCarahuacra = "-2 °C / 13 °C";
+                        sheet.getRange("E7").values = [[fechaHoy]];
+                        sheet.getRange("I7").values = [[climaElegido]];
+                        sheet.getRange("L7").values = [[tempCarahuacra]];
+                        sheet.getRange("E7:L7").format.horizontalAlignment = "Center";
+                        sheet.getRange("A38").values = [["\nRevisado (Supervisor General CQA)"]];
+                        sheet.getRange("C38").values = [["\nAprobado (Gerencia de Operaciones)"]];
+                        sheet.getRange("A38:D38").format.horizontalAlignment = "Center";
+                        await context.sync();
+                        alert("¡Guardia finalizada con éxito! Campos E7, I7 y L7 actualizados en duro sin fórmulas.");
+                        });
+                }
